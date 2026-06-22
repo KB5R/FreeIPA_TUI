@@ -14,6 +14,13 @@ type IPAConfig struct {
 	Insecure bool
 }
 
+type IPAUser struct {
+	Username  string
+	FirstName string
+	LastName  string
+	Email     string
+}
+
 type IPAClient struct {
 	api *freeipa.Client
 }
@@ -39,4 +46,33 @@ func NewIPAClient(config IPAConfig) (*IPAClient, error) {
 	return &IPAClient{
 		api: api,
 	}, nil
+}
+
+func (client *IPAClient) FindUsers(search string) ([]IPAUser, error) {
+	// Отправляем в FreeIPA запрос поиска пользователей.
+	result, err := client.api.UserFind(
+		search,
+		&freeipa.UserFindArgs{},
+		nil,
+	)
+
+	// Если FreeIPA вернул ошибку, передаём её вызывающему коду.
+	if err != nil {
+		return nil, err
+	}
+
+	// Создаём пустой список для наших пользователей.
+	users := []IPAUser{}
+
+	// Wикл обработки найденных пользователей.
+	for _, sourceUser := range result.Result {
+		user := IPAUser{}
+
+		user.Username = sourceUser.UID
+		user.LastName = sourceUser.Sn
+
+		users = append(users, user)
+	}
+
+	return users, nil
 }
