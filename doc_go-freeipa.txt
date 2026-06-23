@@ -1,0 +1,276 @@
+package freeipa // import "github.com/infra-monkey/go-freeipa/freeipa"
+
+type User struct {
+
+	// User login
+
+	UID string `json:"uid,omitempty"`
+
+	// First name
+
+	Givenname *string `json:"givenname,omitempty"`
+
+	// Last name
+
+	Sn string `json:"sn,omitempty"`
+
+	// Full name
+
+	Cn *string `json:"cn,omitempty"`
+
+	// Display name
+
+	Displayname *string `json:"displayname,omitempty"`
+
+	// Initials
+
+	Initials *string `json:"initials,omitempty"`
+
+	// Home directory
+
+	Homedirectory *string `json:"homedirectory,omitempty"`
+
+	// GECOS
+
+	Gecos *string `json:"gecos,omitempty"`
+
+	// Login shell
+
+	Loginshell *string `json:"loginshell,omitempty"`
+
+	// Principal name
+
+	Krbcanonicalname *string `json:"krbcanonicalname,omitempty"`
+
+	// Principal alias
+
+	Krbprincipalname *[]string `json:"krbprincipalname,omitempty"`
+
+	// Kerberos principal expiration
+
+	Krbprincipalexpiration *time.Time `json:"krbprincipalexpiration,omitempty"`
+
+	// User password expiration
+
+	Krbpasswordexpiration *time.Time `json:"krbpasswordexpiration,omitempty"`
+
+	// Email address
+
+	Mail *[]string `json:"mail,omitempty"`
+
+	// Password
+	// Prompt to set the user password
+
+	Userpassword *string `json:"userpassword,omitempty"`
+
+	// Generate a random user password
+
+	Random *bool `json:"random,omitempty"`
+
+	// Random password
+
+	Randompassword *string `json:"randompassword,omitempty"`
+
+	// UID
+	// User ID Number (system will assign one if not provided)
+
+	Uidnumber *int `json:"uidnumber,omitempty"`
+
+	// GID
+	// Group ID Number
+
+	Gidnumber *int `json:"gidnumber,omitempty"`
+
+	// Street address
+
+	Street *string `json:"street,omitempty"`
+
+	// City
+
+	L *string `json:"l,omitempty"`
+
+	// State/Province
+
+	St *string `json:"st,omitempty"`
+
+	// ZIP
+
+	Postalcode *string `json:"postalcode,omitempty"`
+
+	// Telephone Number
+
+	Telephonenumber *[]string `json:"telephonenumber,omitempty"`
+
+	// Mobile Telephone Number
+
+	Mobile *[]string `json:"mobile,omitempty"`
+
+	// Pager Number
+
+	Pager *[]string `json:"pager,omitempty"`
+
+	// Fax Number
+
+	Facsimiletelephonenumber *[]string `json:"facsimiletelephonenumber,omitempty"`
+
+	// Org. Unit
+
+	Ou *string `json:"ou,omitempty"`
+
+	// Job Title
+
+	Title *string `json:"title,omitempty"`
+
+	// Manager
+
+	Manager *string `json:"manager,omitempty"`
+
+	// Car License
+
+	Carlicense *[]string `json:"carlicense,omitempty"`
+
+	// SSH public key
+
+	Ipasshpubkey *[]string `json:"ipasshpubkey,omitempty"`
+
+	// SSH public key fingerprint
+
+	Sshpubkeyfp *[]string `json:"sshpubkeyfp,omitempty"`
+
+	// User authentication types
+	// Types of supported user authentication
+
+	Ipauserauthtype *[]string `json:"ipauserauthtype,omitempty"`
+
+	// Class
+	// User category (semantics placed on this attribute are for local interpretation)
+
+	Userclass *[]string `json:"userclass,omitempty"`
+
+	// RADIUS proxy configuration
+
+	Ipatokenradiusconfiglink *string `json:"ipatokenradiusconfiglink,omitempty"`
+
+	// RADIUS proxy username
+
+	Ipatokenradiususername *string `json:"ipatokenradiususername,omitempty"`
+
+	// External IdP configuration
+
+	Ipaidpconfiglink *string `json:"ipaidpconfiglink,omitempty"`
+
+	// External IdP user identifier
+	// A string that identifies the user at external IdP
+
+	Ipaidpsub *string `json:"ipaidpsub,omitempty"`
+
+	// Department Number
+
+	Departmentnumber *[]string `json:"departmentnumber,omitempty"`
+
+	// Employee Number
+
+	Employeenumber *string `json:"employeenumber,omitempty"`
+
+	// Employee Type
+
+	Employeetype *string `json:"employeetype,omitempty"`
+
+	// Preferred Language
+
+	Preferredlanguage *string `json:"preferredlanguage,omitempty"`
+
+	// Certificate
+	// Base-64 encoded user certificate
+
+	Usercertificate *[]interface{} `json:"usercertificate,omitempty"`
+
+	// Certificate mapping data
+	// Certificate mapping data
+
+	Ipacertmapdata *[]string `json:"ipacertmapdata,omitempty"`
+
+	// SMB logon script path
+
+	Ipantlogonscript *string `json:"ipantlogonscript,omitempty"`
+
+	// SMB profile path
+
+	Ipantprofilepath *string `json:"ipantprofilepath,omitempty"`
+
+	// SMB Home Directory
+
+	Ipanthomedirectory *string `json:"ipanthomedirectory,omitempty"`
+
+	// SMB Home Directory Drive
+
+	Ipanthomedirectorydrive *string `json:"ipanthomedirectorydrive,omitempty"`
+
+	// Passkey mapping
+	// Passkey mapping
+
+	Ipapasskey *[]string `json:"ipapasskey,omitempty"`
+
+	// Account disabled
+
+	Nsaccountlock *bool `json:"nsaccountlock,omitempty"`
+
+	// Preserved user
+
+	Preserved *bool `json:"preserved,omitempty"`
+
+	// Password
+
+	HasPassword *bool `json:"has_password,omitempty"`
+
+	// Member of groups
+
+	MemberofGroup *[]string `json:"memberof_group,omitempty"`
+
+	// Roles
+
+	MemberofRole *[]string `json:"memberof_role,omitempty"`
+
+	// Member of netgroups
+
+	MemberofNetgroup *[]string `json:"memberof_netgroup,omitempty"`
+
+	// Member of Sudo rule
+
+	MemberofSudorule *[]string `json:"memberof_sudorule,omitempty"`
+
+	// Member of HBAC rule
+
+	MemberofHbacrule *[]string `json:"memberof_hbacrule,omitempty"`
+
+	// Subordinate ids
+
+	MemberofSubid *[]string `json:"memberof_subid,omitempty"`
+
+	// Indirect Member of group
+
+	MemberofindirectGroup *[]string `json:"memberofindirect_group,omitempty"`
+
+	// Indirect Member of netgroup
+
+	MemberofindirectNetgroup *[]string `json:"memberofindirect_netgroup,omitempty"`
+
+	// Indirect Member of role
+
+	MemberofindirectRole *[]string `json:"memberofindirect_role,omitempty"`
+
+	// Indirect Member of Sudo rule
+
+	MemberofindirectSudorule *[]string `json:"memberofindirect_sudorule,omitempty"`
+
+	// Indirect Member of HBAC rule
+
+	MemberofindirectHbacrule *[]string `json:"memberofindirect_hbacrule,omitempty"`
+
+	// Kerberos keys available
+
+	HasKeytab *bool `json:"has_keytab,omitempty"`
+}
+
+func (t *User) String() string
+func (out *User) UnmarshalJSON(data []byte) error

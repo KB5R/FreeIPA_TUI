@@ -33,6 +33,16 @@ func main() {
 	}
 	fmt.Println("Найдено пользователей:", len(users))
 	for _, user := range users {
-		fmt.Println(user.Username, user.LastName)
+		fmt.Println("Login", user.Username, "Firstname", user.FirstName, "Lastname", user.LastName)
 	}
+
+	groups, err := client.FindGroups("")
+	if err != nil {
+		fmt.Println("Receiving error FindGroups")
+	}
+	fmt.Println("Найдено групп:", len(groups))
+	for _, group := range groups {
+		fmt.Println("Group", group.Name)
+	}
+
 }

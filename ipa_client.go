@@ -25,6 +25,10 @@ type IPAClient struct {
 	api *freeipa.Client
 }
 
+type IPAGroup struct {
+	Name string
+}
+
 // * означает что мы работает с одним клиетом а не перезаписываем все
 func NewIPAClient(config IPAConfig) (*IPAClient, error) {
 	transport := &http.Transport{
@@ -70,9 +74,35 @@ func (client *IPAClient) FindUsers(search string) ([]IPAUser, error) {
 
 		user.Username = sourceUser.UID
 		user.LastName = sourceUser.Sn
+		if sourceUser.Givenname != nil {
+			user.FirstName = *sourceUser.Givenname
+		}
 
 		users = append(users, user)
 	}
 
 	return users, nil
+}
+
+func (client *IPAClient) FindGroups(search string) ([]IPAGroup, error) {
+	result, err := client.api.GroupFind(
+		search,
+		&freeipa.GroupFindArgs{},
+		nil,
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	groups := []IPAGroup{}
+
+	for _, sourceGroup := range result.Result {
+		group := IPAGroup{}
+		group.Name = sourceGroup.Cn
+
+		groups = append(groups, group)
+	}
+
+	return groups, nil
 }
