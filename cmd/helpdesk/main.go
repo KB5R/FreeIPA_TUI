@@ -5,6 +5,8 @@ import (
 	"os"
 
 	"github.com/joho/godotenv"
+
+	helpdesk "freeipa-tui/internal/helpdesk/backend"
 )
 
 func main() {
@@ -12,14 +14,14 @@ func main() {
 		fmt.Println("Failed to load .env", err)
 	}
 
-	config := IPAConfig{
+	config := helpdesk.IPAConfig{
 		Host:     "ipa.example.test",
 		Username: os.Getenv("FREEIPA_USERNAME"),
 		Password: os.Getenv("FREEIPA_PASSWORD"),
 		Insecure: true,
 	}
 
-	client, err := NewIPAClient(config)
+	client, err := helpdesk.NewIPAClient(config)
 	if err != nil {
 		fmt.Println("Error connection API", err)
 		return
@@ -43,15 +45,6 @@ func main() {
 	fmt.Println("Найдено групп:", len(groups))
 	for _, group := range groups {
 		fmt.Println("Group", group.Name)
-	}
-
-	hosts, err := client.FindHosts("")
-	if err != nil {
-		fmt.Println("Receiving error FindHosts")
-	}
-	fmt.Println("Найдено хостов", len(hosts))
-	for _, host := range hosts {
-		fmt.Println("Host", host.FQDN)
 	}
 
 }
