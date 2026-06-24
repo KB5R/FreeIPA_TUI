@@ -45,4 +45,13 @@ func main() {
 		fmt.Println("Group", group.Name)
 	}
 
+	hosts, err := client.FindHosts("")
+	if err != nil {
+		fmt.Println("Receiving error FindHosts")
+	}
+	fmt.Println("Найдено хостов", len(hosts))
+	for _, host := range hosts {
+		fmt.Println("Host", host.FQDN)
+	}
+
 }

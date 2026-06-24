@@ -29,6 +29,10 @@ type IPAGroup struct {
 	Name string
 }
 
+type IPAHost struct {
+	FQDN string
+}
+
 // * означает что мы работает с одним клиетом а не перезаписываем все
 func NewIPAClient(config IPAConfig) (*IPAClient, error) {
 	transport := &http.Transport{
@@ -105,4 +109,27 @@ func (client *IPAClient) FindGroups(search string) ([]IPAGroup, error) {
 	}
 
 	return groups, nil
+}
+
+func (client *IPAClient) FindHosts(search string) ([]IPAHost, error) {
+	result, err := client.api.HostFind(
+		search,
+		&freeipa.HostFindArgs{},
+		nil,
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	hosts := []IPAHost{}
+
+	for _, sourceHost := range result.Result {
+		host := IPAHost{}
+		host.FQDN = sourceHost.Fqdn
+
+		hosts = append(hosts, host)
+	}
+
+	return hosts, nil
 }
