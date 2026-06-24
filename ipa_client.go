@@ -33,6 +33,20 @@ type IPAHost struct {
 	FQDN string
 }
 
+type IPAHostGroup struct {
+	Name string
+}
+
+type IPAHBACRule struct {
+	Name    string
+	Enabled bool
+}
+
+type IPASudoRule struct {
+	Name    string
+	Enabled bool
+}
+
 // * означает что мы работает с одним клиетом а не перезаписываем все
 func NewIPAClient(config IPAConfig) (*IPAClient, error) {
 	transport := &http.Transport{
@@ -132,4 +146,73 @@ func (client *IPAClient) FindHosts(search string) ([]IPAHost, error) {
 	}
 
 	return hosts, nil
+}
+
+func (client *IPAClient) FindHostGroups(search string) ([]IPAHostGroup, error) {
+	result, err := client.api.HostgroupFind(
+		search,
+		&freeipa.HostgroupFindArgs{},
+		nil,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	hostGroups := []IPAHostGroup{}
+	for _, sourceHostGroup := range result.Result {
+		hostGroup := IPAHostGroup{}
+		hostGroup.Name = sourceHostGroup.Cn
+
+		hostGroups = append(hostGroups, hostGroup)
+	}
+
+	return hostGroups, nil
+}
+
+func (client *IPAClient) FindHBACRules(search string) ([]IPAHBACRule, error) {
+	result, err := client.api.HbacruleFind(
+		search,
+		&freeipa.HbacruleFindArgs{},
+		nil,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	rules := []IPAHBACRule{}
+	for _, sourceRule := range result.Result {
+		rule := IPAHBACRule{}
+		rule.Name = sourceRule.Cn
+		if sourceRule.Ipaenabledflag != nil {
+			rule.Enabled = *sourceRule.Ipaenabledflag
+		}
+
+		rules = append(rules, rule)
+	}
+
+	return rules, nil
+}
+
+func (client *IPAClient) FindSudoRules(search string) ([]IPASudoRule, error) {
+	result, err := client.api.SudoruleFind(
+		search,
+		&freeipa.SudoruleFindArgs{},
+		nil,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	rules := []IPASudoRule{}
+	for _, sourceRule := range result.Result {
+		rule := IPASudoRule{}
+		rule.Name = sourceRule.Cn
+		if sourceRule.Ipaenabledflag != nil {
+			rule.Enabled = *sourceRule.Ipaenabledflag
+		}
+
+		rules = append(rules, rule)
+	}
+
+	return rules, nil
 }
