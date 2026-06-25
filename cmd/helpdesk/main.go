@@ -1,6 +1,22 @@
 package main
 
 import (
+	"log"
+
+	helpdeskui "freeipa-tui/internal/helpdesk/ui"
+)
+
+func main() {
+	if err := helpdeskui.Run(); err != nil {
+		log.Fatal(err)
+	}
+}
+
+/*
+Старый проверочный запуск FreeIPA.
+Оставляем пока тут, чтобы можно было быстро подсмотреть, как мы проверяли backend.
+
+import (
 	"fmt"
 	"os"
 
@@ -46,5 +62,5 @@ func main() {
 	for _, group := range groups {
 		fmt.Println("Group", group.Name)
 	}
-
 }
+*/
