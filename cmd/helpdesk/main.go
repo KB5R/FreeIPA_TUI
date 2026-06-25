@@ -2,12 +2,32 @@ package main
 
 import (
 	"log"
+	"os"
 
+	"github.com/joho/godotenv"
+
+	helpdesk "freeipa-tui/internal/helpdesk/backend"
 	helpdeskui "freeipa-tui/internal/helpdesk/ui"
 )
 
 func main() {
-	if err := helpdeskui.Run(); err != nil {
+	if err := godotenv.Load(); err != nil {
+		log.Println("Failed to load .env:", err)
+	}
+
+	config := helpdesk.IPAConfig{
+		Host:     "ipa.example.test",
+		Username: os.Getenv("FREEIPA_USERNAME"),
+		Password: os.Getenv("FREEIPA_PASSWORD"),
+		Insecure: true,
+	}
+
+	client, err := helpdesk.NewIPAClient(config)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if err := helpdeskui.Run(client); err != nil {
 		log.Fatal(err)
 	}
 }

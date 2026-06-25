@@ -1,11 +1,15 @@
 package ui
 
 import (
+	"fmt"
+
+	helpdesk "freeipa-tui/internal/helpdesk/backend"
+
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 )
 
-func Run() error {
+func Run(client *helpdesk.IPAClient) error {
 	app := tview.NewApplication()
 	pages := tview.NewPages()
 
@@ -26,11 +30,35 @@ func Run() error {
 	searchInput := tview.NewInputField()
 	searchInput.SetLabel("Поиск: ")
 	searchInput.SetPlaceholder("login, имя или фамилия")
+	searchInput.SetFieldWidth(40)
+	searchInput.SetLabelColor(tcell.ColorYellow)
+	searchInput.SetFieldBackgroundColor(tcell.ColorBlack)
+	searchInput.SetFieldTextColor(tcell.ColorWhite)
 
-	searchResults := tview.NewTextView()
+	searchHint := tview.NewTextView()
+	searchHint.SetText("Введите логин, имя или фамилию и нажмите Enter. Esc — назад.")
+
+	searchResults := tview.NewList()
 	searchResults.SetBorder(true)
 	searchResults.SetTitle(" Результат ")
-	searchResults.SetText("Введите запрос и нажмите Enter")
+	searchResults.ShowSecondaryText(false)
+	searchResults.AddItem("Введите запрос и нажмите Enter", "", 0, nil)
+
+	userCard := tview.NewTextView()
+	userCard.SetBorder(true)
+	userCard.SetTitle(" Карточка пользователя ")
+
+	showUserCard := func(user helpdesk.IPAUser) {
+		userCard.SetText(fmt.Sprintf(
+			"Login: %s\nИмя: %s\nФамилия: %s\n\nДействия появятся тут позже.\n\nEsc — назад к результатам поиска",
+			user.Username,
+			user.FirstName,
+			user.LastName,
+		))
+
+		pages.SwitchToPage("user_card")
+		app.SetFocus(userCard)
+	}
 
 	searchInput.SetDoneFunc(func(key tcell.Key) {
 		if key != tcell.KeyEnter {
@@ -39,11 +67,38 @@ func Run() error {
 
 		query := searchInput.GetText()
 		if query == "" {
-			searchResults.SetText("Введите логин, имя или фамилию пользователя.")
+			searchResults.Clear()
+			searchResults.AddItem("Введите логин, имя или фамилию пользователя.", "", 0, nil)
 			return
 		}
 
-		searchResults.SetText("Пока это заглушка.\n\nЗапрос: " + query)
+		searchResults.Clear()
+		searchResults.AddItem("Ищу пользователей...", "", 0, nil)
+
+		users, err := client.FindUsers(query)
+		if err != nil {
+			searchResults.Clear()
+			searchResults.AddItem("Ошибка поиска пользователя: "+err.Error(), "", 0, nil)
+			return
+		}
+
+		if len(users) == 0 {
+			searchResults.Clear()
+			searchResults.AddItem("Пользователи не найдены.", "", 0, nil)
+			return
+		}
+
+		searchResults.Clear()
+		searchResults.SetTitle(fmt.Sprintf(" Результат: %d ", len(users)))
+		for _, user := range users {
+			user := user
+			title := fmt.Sprintf("%s — %s %s", user.Username, user.FirstName, user.LastName)
+			searchResults.AddItem(title, "", 0, func() {
+				showUserCard(user)
+			})
+		}
+
+		app.SetFocus(searchResults)
 	})
 
 	menu.AddItem("Найти пользователя", "", '1', func() {
@@ -85,15 +140,18 @@ func Run() error {
 	searchPanel := tview.NewFlex()
 	searchPanel.SetBorder(true)
 	searchPanel.SetTitle(" Поиск пользователя ")
-	searchPanel.AddItem(searchInput, 0, 1, true)
+	searchPanel.SetDirection(tview.FlexRow)
+	searchPanel.AddItem(searchInput, 1, 0, true)
+	searchPanel.AddItem(searchHint, 1, 0, false)
 
 	userFindScreen := tview.NewFlex()
 	userFindScreen.SetDirection(tview.FlexRow)
-	userFindScreen.AddItem(searchPanel, 3, 0, true)
+	userFindScreen.AddItem(searchPanel, 4, 0, true)
 	userFindScreen.AddItem(searchResults, 0, 1, false)
 
 	pages.AddPage("main", layout, true, true)
 	pages.AddPage("user_find", userFindScreen, true, false)
+	pages.AddPage("user_card", userCard, true, false)
 
 	app.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
 		switch event.Key() {
@@ -107,7 +165,14 @@ func Run() error {
 				return nil
 			}
 
+			if pageName == "user_card" {
+				pages.SwitchToPage("user_find")
+				app.SetFocus(searchResults)
+				return nil
+			}
+
 			pages.SwitchToPage("main")
+			app.SetFocus(menu)
 			return nil
 		}
 
